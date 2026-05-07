@@ -79,7 +79,8 @@ CREATE INDEX IF NOT EXISTS idx_transactions_cust  ON transactions(customer_id);
 """
 
 
-def init_db(path: str = DB_PATH) -> None:
+def init_db(path: str | None = None) -> None:
+    path = path or DB_PATH
     conn = sqlite3.connect(path, isolation_level=None)
     try:
         conn.executescript(_DDL)
@@ -88,7 +89,8 @@ def init_db(path: str = DB_PATH) -> None:
 
 
 @contextmanager
-def get_conn(path: str = DB_PATH) -> Generator[sqlite3.Connection, None, None]:
+def get_conn(path: str | None = None) -> Generator[sqlite3.Connection, None, None]:
+    path = path or DB_PATH
     conn = sqlite3.connect(path, isolation_level=None)
     conn.row_factory = sqlite3.Row
     try:
@@ -98,13 +100,14 @@ def get_conn(path: str = DB_PATH) -> Generator[sqlite3.Connection, None, None]:
 
 
 @contextmanager
-def atomic(path: str = DB_PATH) -> Generator[sqlite3.Connection, None, None]:
+def atomic(path: str | None = None) -> Generator[sqlite3.Connection, None, None]:
     """Exclusive write transaction using BEGIN IMMEDIATE.
 
     Guarantees that the read-check-write sequence inside is atomic:
     no other writer can interleave between our SELECT and UPDATE.
     All balance and quote mutations must go through this context manager.
     """
+    path = path or DB_PATH
     conn = sqlite3.connect(path, isolation_level=None)
     conn.row_factory = sqlite3.Row
     conn.execute("BEGIN IMMEDIATE")

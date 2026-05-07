@@ -53,7 +53,7 @@ def generate_quote(
     from_currency: str,
     to_currency: str,
     from_amount: Decimal,
-    path: str = db.DB_PATH,
+    path: str | None = None,
 ) -> dict:
     if from_currency not in SUPPORTED_CURRENCIES:
         raise ValueError(f"unsupported currency: {from_currency}")
@@ -125,7 +125,7 @@ def execute_quote(
     quote_id: str,
     customer_id: str,
     idempotency_key: str | None = None,
-    path: str = db.DB_PATH,
+    path: str | None = None,
 ) -> tuple[dict, int]:
     """Execute a quote atomically. Returns (response_dict, http_status_code).
 

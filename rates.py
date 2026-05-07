@@ -68,7 +68,7 @@ def compute_buy_sell(mid: Decimal, spread: Decimal) -> tuple[Decimal, Decimal]:
     return buy, sell
 
 
-def refresh_rates(source: str = "stub", path: str = db.DB_PATH) -> list[RateRow]:
+def refresh_rates(source: str = "stub", path: str | None = None) -> list[RateRow]:
     if source != "stub":
         raise RateSourceError(f"unsupported source: {source}")
 
@@ -98,7 +98,7 @@ def refresh_rates(source: str = "stub", path: str = db.DB_PATH) -> list[RateRow]
     return rows
 
 
-def get_rate_row(pair: str, path: str = db.DB_PATH) -> RateRow | None:
+def get_rate_row(pair: str, path: str | None = None) -> RateRow | None:
     with db.get_conn(path) as conn:
         row = conn.execute(
             "SELECT * FROM rates WHERE pair = ?", (pair,)
@@ -116,7 +116,7 @@ def get_rate_row(pair: str, path: str = db.DB_PATH) -> RateRow | None:
     )
 
 
-def get_all_rate_rows(path: str = db.DB_PATH) -> list[RateRow]:
+def get_all_rate_rows(path: str | None = None) -> list[RateRow]:
     with db.get_conn(path) as conn:
         rows = conn.execute("SELECT * FROM rates ORDER BY pair").fetchall()
     return [
@@ -147,7 +147,7 @@ def _check_staleness(row: RateRow) -> None:
 def resolve_rate(
     from_currency: str,
     to_currency: str,
-    path: str = db.DB_PATH,
+    path: str | None = None,
 ) -> ResolvedRate:
     """Resolve the effective rate for a (from, to) conversion.
 

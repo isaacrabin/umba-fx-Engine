@@ -22,7 +22,7 @@ class InsufficientFundsError(Exception):
     pass
 
 
-def create_customer(name: str, path: str = db.DB_PATH) -> dict:
+def create_customer(name: str, path: str | None = None) -> dict:
     customer_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
 
@@ -41,7 +41,7 @@ def create_customer(name: str, path: str = db.DB_PATH) -> dict:
     return {"id": customer_id, "name": name, "created_at": now}
 
 
-def get_customer(customer_id: str, path: str = db.DB_PATH) -> dict:
+def get_customer(customer_id: str, path: str | None = None) -> dict:
     with db.get_conn(path) as conn:
         row = conn.execute(
             "SELECT * FROM customers WHERE id = ?", (customer_id,)
@@ -51,7 +51,7 @@ def get_customer(customer_id: str, path: str = db.DB_PATH) -> dict:
     return {"id": row["id"], "name": row["name"], "created_at": row["created_at"]}
 
 
-def get_balances(customer_id: str, path: str = db.DB_PATH) -> list[dict]:
+def get_balances(customer_id: str, path: str | None = None) -> list[dict]:
     get_customer(customer_id, path)  # raises if not found
     with db.get_conn(path) as conn:
         rows = conn.execute(
@@ -74,7 +74,7 @@ def credit_balance(
     customer_id: str,
     currency: str,
     amount: Decimal,
-    path: str = db.DB_PATH,
+    path: str | None = None,
 ) -> list[dict]:
     """Credit `amount` to the customer's `currency` balance. Returns updated balances."""
     if amount <= 0:
