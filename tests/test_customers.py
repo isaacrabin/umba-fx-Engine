@@ -5,7 +5,8 @@ from decimal import Decimal
 
 import pytest
 
-from customers import (
+from app import db as db_module
+from app.customers import (
     CustomerNotFoundError,
     InsufficientFundsError,
     create_customer,
@@ -15,7 +16,6 @@ from customers import (
     get_balances,
     get_customer,
 )
-import db as db_module
 
 CURRENCIES = ("EUR", "KES", "NGN", "USD")
 
@@ -98,7 +98,6 @@ def test_debit_insufficient_funds_rolls_back(db_path):
             debit_balance(c["id"], "USD", Decimal("100"), conn)
     except InsufficientFundsError:
         pass
-    # balance unchanged after rollback
     bals = {b["currency"]: b["amount"] for b in get_balances(c["id"])}
     assert bals["USD"] == "50.00"
 

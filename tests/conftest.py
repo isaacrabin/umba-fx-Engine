@@ -1,12 +1,4 @@
-"""Shared fixtures for all test modules.
-
-Strategy:
-- Each test gets an isolated SQLite file via tmp_path.
-- db.DB_PATH is monkeypatched so all domain functions (customers, fx, rates)
-  resolve to the test DB at call time (they all use `path = path or db.DB_PATH`).
-- HTTP-level tests use httpx.Client with ASGITransport; the same DB_PATH patch
-  applies because route handlers call domain functions with no explicit path.
-"""
+"""Shared fixtures for all test modules."""
 from __future__ import annotations
 
 from decimal import Decimal
@@ -14,12 +6,10 @@ from decimal import Decimal
 import pytest
 from httpx import ASGITransport, Client
 
-import db as db_module
-import rates as rates_module
-import customers as customers_module
-import fx as fx_module
-from app import app
-from customers import create_customer, credit_balance
+from app import db as db_module
+from app import rates as rates_module
+from app.api import app
+from app.customers import create_customer, credit_balance
 
 
 @pytest.fixture

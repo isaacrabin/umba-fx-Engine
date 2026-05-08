@@ -7,7 +7,7 @@ from decimal import Decimal
 
 import structlog
 
-import db
+from app import db
 
 log = structlog.get_logger()
 

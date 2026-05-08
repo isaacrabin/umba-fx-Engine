@@ -16,16 +16,16 @@ import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-import db as db_module
-import rates as rates_module
-from customers import create_customer, credit_balance
-from fx import (
+from app import db as db_module
+from app import rates as rates_module
+from app.customers import create_customer, credit_balance
+from app.fx import (
     QuoteAlreadyExecutedError,
     QuoteExpiredError,
     execute_quote,
     generate_quote,
 )
-from rates import get_rate_row
+from app.rates import get_rate_row
 
 CURRENCIES = ["USD", "EUR", "KES", "NGN"]
 
@@ -106,7 +106,7 @@ def test_to_amount_equals_from_amount_times_rate(property_customer, from_ccy, to
 
 def test_cross_pair_rate_near_inverse(property_db):
     """KES/NGN rate × NGN/KES rate should be close to 1 (within spread²)."""
-    from rates import resolve_rate
+    from app.rates import resolve_rate
 
     r_fwd = resolve_rate("KES", "NGN")
     r_inv = resolve_rate("NGN", "KES")

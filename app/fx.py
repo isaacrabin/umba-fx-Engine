@@ -15,15 +15,15 @@ from decimal import Decimal, ROUND_HALF_UP
 
 import structlog
 
-import db
-from customers import (
+from app import db
+from app.customers import (
     CustomerNotFoundError,
     InsufficientFundsError,
     credit_balance_conn,
     debit_balance,
     get_customer,
 )
-from rates import StaleRateError, UnresolvablePairError, resolve_rate
+from app.rates import StaleRateError, UnresolvablePairError, resolve_rate
 
 log = structlog.get_logger()
 

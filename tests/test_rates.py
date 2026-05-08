@@ -6,9 +6,8 @@ from decimal import Decimal
 
 import pytest
 
-import db as db_module
-import rates
-from rates import (
+from app import db as db_module
+from app.rates import (
     SPREAD_DEFAULT,
     STUB_MIDS,
     StaleRateError,
@@ -69,7 +68,6 @@ def test_inverse_pair_uses_buy_not_mid(db_path):
     row = get_rate_row("USD/KES")
     r = resolve_rate("KES", "USD")
     assert r["route"] == "inverse"
-    # Must be 1/buy, not 1/mid
     expected = (Decimal("1") / row["buy"]).quantize(Decimal("0.0000001"))
     wrong_mid = (Decimal("1") / row["mid"]).quantize(Decimal("0.0000001"))
     assert r["rate"] == expected

@@ -11,9 +11,9 @@ from fastapi import FastAPI, Header, HTTPException, Request, Response
 from fastapi.responses import JSONResponse, PlainTextResponse
 from prometheus_client import Counter, Gauge, generate_latest, CONTENT_TYPE_LATEST
 
-import db
-import rates as rate_module
-from customers import (
+from app import db
+from app import rates as rate_module
+from app.customers import (
     CustomerNotFoundError,
     InsufficientFundsError,
     create_customer,
@@ -21,14 +21,14 @@ from customers import (
     get_customer,
     credit_balance,
 )
-from fx import (
+from app.fx import (
     QuoteAlreadyExecutedError,
     QuoteExpiredError,
     QuoteNotFoundError,
     execute_quote,
     generate_quote,
 )
-from models import (
+from app.models import (
     BalancesResponse,
     BalanceResponse,
     CreateCustomerRequest,
@@ -41,7 +41,7 @@ from models import (
     RatesRefreshResponse,
     TransactionResponse,
 )
-from rates import RateSourceError, StaleRateError, UnresolvablePairError
+from app.rates import RateSourceError, StaleRateError, UnresolvablePairError
 
 structlog.configure(
     processors=[

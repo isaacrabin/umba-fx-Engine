@@ -7,15 +7,15 @@ from decimal import Decimal
 
 import pytest
 
-import db as db_module
-from customers import (
+from app import db as db_module
+from app.customers import (
     InsufficientFundsError,
     create_customer,
     credit_balance,
     get_balance_decimal,
     get_balances,
 )
-from fx import (
+from app.fx import (
     QuoteAlreadyExecutedError,
     QuoteExpiredError,
     QuoteNotFoundError,
@@ -143,7 +143,7 @@ def test_execute_insufficient_funds_no_balance_change(db_path):
 
 def test_atomic_debit_rolls_back_on_credit_failure(customer, db_path, monkeypatch):
     """If credit_balance_conn raises, the debit must also be rolled back."""
-    import fx as fx_module  # patch on fx since it does `from customers import credit_balance_conn`
+    from app import fx as fx_module  # patch on app.fx since it does `from app.customers import credit_balance_conn`
 
     def failing_credit(*args, **kwargs):
         raise RuntimeError("simulated credit failure")

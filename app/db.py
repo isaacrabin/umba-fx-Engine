@@ -11,7 +11,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator
 
-DB_PATH = str(Path(__file__).parent / "fx.db")
+DB_PATH = str(Path(__file__).parent.parent / "fx.db")
 
 _DDL = """
 PRAGMA journal_mode=WAL;

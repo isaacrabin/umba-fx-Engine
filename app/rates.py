@@ -18,7 +18,7 @@ from typing import TypedDict
 
 import structlog
 
-import db
+from app import db
 
 log = structlog.get_logger()
 

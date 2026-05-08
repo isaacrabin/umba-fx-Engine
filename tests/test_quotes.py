@@ -6,11 +6,10 @@ from decimal import Decimal
 
 import pytest
 
-import db as db_module
-import rates as rates_module
-from customers import create_customer, credit_balance
-from fx import QuoteNotFoundError, generate_quote
-from rates import get_rate_row, resolve_rate
+from app import db as db_module
+from app.customers import create_customer, credit_balance, CustomerNotFoundError
+from app.fx import generate_quote
+from app.rates import get_rate_row, resolve_rate
 
 
 @pytest.fixture
@@ -40,7 +39,7 @@ def test_quote_expires_60s_from_now(customer, db_path):
     if expires.tzinfo is None:
         expires = expires.replace(tzinfo=timezone.utc)
     delta = (expires - created).total_seconds()
-    assert 58 <= delta <= 62  # allow small clock skew in test
+    assert 58 <= delta <= 62
 
 
 def test_direct_pair_uses_sell_rate(customer, db_path):
@@ -90,15 +89,10 @@ def test_no_float_in_response(customer, db_path):
 
 
 def test_stored_rate_not_recalculated(customer, db_path):
-    """Rate stored at quote time must not change even after rates are refreshed."""
     q = generate_quote(customer["id"], "USD", "KES", Decimal("100"))
     original_rate = q["rate"]
-
-    # Mutate rates in DB
     with db_module.atomic() as conn:
         conn.execute("UPDATE rates SET sell = '999.99', buy = '998.00' WHERE pair = 'USD/KES'")
-
-    # The stored rate in the quote row should still be the original
     with db_module.get_conn() as conn:
         row = conn.execute("SELECT rate FROM quotes WHERE id = ?", (q["quote_id"],)).fetchone()
     assert row["rate"] == original_rate
@@ -125,6 +119,5 @@ def test_quote_rejects_negative_amount(customer, db_path):
 
 
 def test_quote_unknown_customer_raises(db_path):
-    from customers import CustomerNotFoundError
     with pytest.raises(CustomerNotFoundError):
         generate_quote("bad-id", "USD", "KES", Decimal("100"))
