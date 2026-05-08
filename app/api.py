@@ -289,18 +289,17 @@ async def healthz():
     rows = rate_module.get_all_rate_rows()
     rates_age: float | None = None
     if rows:
+        def _to_utc(ts: str) -> datetime:
+            dt = datetime.fromisoformat(ts)
+            return dt if dt.tzinfo is not None else dt.replace(tzinfo=timezone.utc)
+
         oldest = min(
-            (datetime.now(timezone.utc) - datetime.fromisoformat(r["updated_at"]).replace(
-                tzinfo=timezone.utc if datetime.fromisoformat(r["updated_at"]).tzinfo is None else None
-            )).total_seconds()
+            (datetime.now(timezone.utc) - _to_utc(r["updated_at"])).total_seconds()
             for r in rows
         )
         rates_age = oldest
         for r in rows:
-            updated = datetime.fromisoformat(r["updated_at"])
-            if updated.tzinfo is None:
-                updated = updated.replace(tzinfo=timezone.utc)
-            age = (datetime.now(timezone.utc) - updated).total_seconds()
+            age = (datetime.now(timezone.utc) - _to_utc(r["updated_at"])).total_seconds()
             rate_age.labels(pair=r["pair"]).set(age)
 
     status = "ok" if db_ok and rates_age is not None else "degraded"
